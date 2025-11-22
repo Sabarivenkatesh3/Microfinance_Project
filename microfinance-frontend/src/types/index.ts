@@ -19,6 +19,7 @@ export interface Loan {
   end_date: string;
   number_of_installments: number;
   loan_duration_days: number;
+  status?: string;
   notes?: string;
   created_at: string;
 }

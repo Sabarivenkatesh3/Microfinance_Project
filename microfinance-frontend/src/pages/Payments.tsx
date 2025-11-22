@@ -71,6 +71,7 @@ export default function Payments() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!selectedLoanId || !paymentAmount) {
       toast({
         title: "Error",
@@ -80,17 +81,24 @@ export default function Payments() {
       return;
     }
 
+    const amount = parseFloat(paymentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid payment amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createPaymentMutation.mutate({
       loan_id: selectedLoanId,
-      paid_amount: parseFloat(paymentAmount),
+      paid_amount: amount,
       payment_date: paymentDate,
       notes: notes || undefined,
     });
   };
 
-  if (isLoading) {
-    return <div className="text-center py-8">Loading payments...</div>;
-  }
 
   return (
     <div className="space-y-6">
@@ -202,35 +210,41 @@ export default function Payments() {
           <CardTitle>Active Loans</CardTitle>
         </CardHeader>
         <CardContent>
-          {allLoans && allLoans.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer ID</TableHead>
-                  <TableHead>Principal</TableHead>
-                  <TableHead>Total Amount</TableHead>
-                  <TableHead>Frequency</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allLoans.map((loan) => (
-                  <TableRow key={loan.id}>
-                    <TableCell className="font-medium font-mono text-xs">{loan.customer_id.slice(0, 8)}...</TableCell>
-                    <TableCell>₹{loan.principal_amount.toLocaleString()}</TableCell>
-                    <TableCell>₹{loan.total_amount.toLocaleString()}</TableCell>
-                    <TableCell className="capitalize">{loan.repayment_frequency}</TableCell>
-                    <TableCell>{new Date(loan.start_date).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Badge variant="default">Active</Badge>
-                    </TableCell>
+          {isLoading ? (
+            <div className="text-center py-8">Loading loans...</div>
+          ) : allLoans && allLoans.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer ID</TableHead>
+                    <TableHead>Principal</TableHead>
+                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {allLoans.map((loan) => (
+                    <TableRow key={loan.id}>
+                      <TableCell className="font-medium font-mono text-xs">
+                        {loan.customer_id ? String(loan.customer_id).slice(0, 8) + '...' : 'N/A'}
+                      </TableCell>
+                      <TableCell>₹{Number(loan.principal_amount).toLocaleString()}</TableCell>
+                      <TableCell>₹{Number(loan.total_amount).toLocaleString()}</TableCell>
+                      <TableCell className="capitalize">{loan.repayment_frequency}</TableCell>
+                      <TableCell>{new Date(loan.start_date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Badge variant="default">{loan.status || 'Active'}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">No loans found</p>
+            <p className="text-center text-muted-foreground py-8">No active loans found</p>
           )}
         </CardContent>
       </Card>
