@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from .database import Base, engine
 from .routers import customers, loans, payments, dashboard, ledger
-
+from fastapi.middleware.cors import CORSMiddleware
 
 import logging
 
@@ -23,3 +23,10 @@ def root():
     return {"message": "Microfinance SaaS Backend Running"}
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

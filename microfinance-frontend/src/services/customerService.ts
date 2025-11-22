@@ -32,7 +32,7 @@ export const customerService = {
   },
 
   getLedger: async (customerId: string) => {
-    const response = await api.get(`/customers/${customerId}/ledger`);
+    const response = await api.get<import("@/types").CustomerLedgerResponse>(`/customers/${customerId}/ledger`);
     return response.data;
   },
 };

@@ -69,11 +69,36 @@ export interface TodayCollection {
 }
 
 export interface LedgerEntry {
-  date: string;
-  type: "loan" | "payment";
-  description: string;
   loan_id: string;
-  debit: number;
-  credit: number;
-  balance: number;
+  principal_amount: number;
+  interest_amount: number;
+  total_amount: number;
+  installment_amount: number;
+  number_of_installments: number;
+  installments_paid: number;
+  installments_remaining: number;
+  total_paid: number;
+  remaining_amount: number;
+  start_date: string;
+  end_date: string;
+  last_payment_date: string | null;
+  next_due_date: string | null;
+  is_overdue: boolean;
+  overdue_days: number;
+  status: string;
+  payments: PaymentDetail[];
+}
+
+export interface PaymentDetail {
+  payment_id: string;
+  amount: number;
+  date: string;
+  notes?: string;
+}
+
+export interface CustomerLedgerResponse {
+  customer_id: string;
+  customer_name: string;
+  customer_phone: string;
+  ledger: LedgerEntry[];
 }

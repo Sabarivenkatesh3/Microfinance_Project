@@ -142,29 +142,31 @@ export default function CustomerDetail() {
               <CardTitle>Payment Ledger</CardTitle>
             </CardHeader>
             <CardContent>
-              {ledger && ledger.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Debit</TableHead>
-                      <TableHead>Credit</TableHead>
-                      <TableHead className="text-right">Balance</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {ledger.map((entry: any, index: number) => (
-                      <TableRow key={index}>
-                        <TableCell>{new Date(entry.date).toLocaleDateString()}</TableCell>
-                        <TableCell>{entry.description}</TableCell>
-                        <TableCell>{entry.debit > 0 ? `₹${entry.debit.toLocaleString()}` : "-"}</TableCell>
-                        <TableCell>{entry.credit > 0 ? `₹${entry.credit.toLocaleString()}` : "-"}</TableCell>
-                        <TableCell className="text-right font-medium">₹{entry.balance.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              {ledger && ledger.ledger && ledger.ledger.length > 0 ? (
+                <div className="space-y-4">
+                  {ledger.ledger.map((loan: any, index: number) => (
+                    <div key={loan.loan_id} className="border rounded-lg p-4">
+                      <h4 className="font-semibold mb-2">Loan #{index + 1}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Total:</span>{" "}
+                          ₹{loan.total_amount.toLocaleString()}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Paid:</span>{" "}
+                          <span className="text-success">₹{loan.total_paid.toLocaleString()}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Remaining:</span>{" "}
+                          <span className="text-warning">₹{loan.remaining_amount.toLocaleString()}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Status:</span> {loan.status}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-center text-muted-foreground py-8">No ledger entries found</p>
               )}

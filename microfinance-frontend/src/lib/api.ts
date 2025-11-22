@@ -7,13 +7,22 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response?.data || error.message);
+    const message = error.response?.data?.detail || error.message;
+    console.error("API Error:", message);
+    
+    // Network error handling
+    if (!error.response) {
+      console.error("Network Error: Cannot connect to backend at", API_BASE_URL);
+      console.error("Please ensure your FastAPI backend is running!");
+    }
+    
     return Promise.reject(error);
   }
 );
