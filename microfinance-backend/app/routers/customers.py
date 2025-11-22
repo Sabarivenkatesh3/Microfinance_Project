@@ -74,43 +74,24 @@ def delete_customer(customer_id: UUID, db: Session = Depends(get_db)):
     return None
 
 
-@router.get("/{customer_id}/loans", response_model=CustomerLoanList)
+@router.get("/{customer_id}/loans")
 def get_customer_loans(customer_id: str, db: Session = Depends(get_db)):
 
-    # Check customer exists
     customer = db.query(models.Customer).filter(models.Customer.id == customer_id).first()
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
 
-    # Get all loans for this customer
     loans = db.query(models.Loan).filter(models.Loan.customer_id == customer_id).all()
 
-    loan_items = []
-
-    for loan in loans:
-        total_paid = (
-            db.query(func.coalesce(func.sum(models.Payment.paid_amount), 0))
-            .filter(models.Payment.loan_id == loan.id)
-            .scalar()
-        )
-
-        remaining = loan.total_amount - total_paid
-        installments_paid = int(total_paid / loan.installment_amount)
-        installments_remaining = loan.number_of_installments - installments_paid
-
-        loan_items.append(
-            {
-                "loan_id": loan.id,
-                "total_amount": loan.total_amount,
-                "total_paid": total_paid,
-                "remaining_amount": remaining,
-                "installments_paid": installments_paid,
-                "installments_remaining": installments_remaining,
-                "status": loan.status,
-            }
-        )
-
-    return {
-        "customer_id": customer.id,
-        "loans": loan_items
-    }
+    return [
+        {
+            "id": loan.id,
+            "principal_amount": float(loan.principal_amount),
+            "total_amount": float(loan.total_amount),
+            "installment_amount": float(loan.installment_amount),
+            "repayment_frequency": loan.repayment_frequency,
+            "start_date": loan.start_date,
+            "status": loan.status  # 🔥 required for Payments UI
+        }
+        for loan in loans
+    ]

@@ -6,7 +6,8 @@ from ..database import get_db
 from .. import models
 from ..schemas.loans import LoanCreate, LoanResponse, LoanSummary
 import math
-
+from typing import List
+from ..schemas.loans import LoanResponse
 router = APIRouter(prefix="/loans", tags=["Loans"])
 
 
@@ -134,3 +135,14 @@ def get_loan_summary(loan_id: str, db: Session = Depends(get_db)):
         "overdue_days": overdue_days,
         "status": status
     }
+
+@router.get("/", response_model=List[LoanResponse])
+def list_loans(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    loans = (
+        db.query(models.Loan)
+        .order_by(models.Loan.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return loans
