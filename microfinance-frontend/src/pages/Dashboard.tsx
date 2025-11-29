@@ -17,13 +17,17 @@ export default function Dashboard() {
   const { data: summary, isLoading } = useQuery({
     queryKey: ["dashboard-summary"],
     queryFn: dashboardService.getSummary,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const { data: todayCollection } = useQuery({
     queryKey: ["today-collection"],
     queryFn: dashboardService.getTodayCollection,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
+    staleTime: 0, // Always consider data stale to ensure fresh fetches
+    refetchOnWindowFocus: true,
   });
 
   const { data: overdueLoans } = useQuery({

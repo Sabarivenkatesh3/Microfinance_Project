@@ -42,16 +42,18 @@ export default function Payments() {
 
   const createPaymentMutation = useMutation({
     mutationFn: paymentService.create,
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Success",
         description: "Payment added successfully",
       });
-      // Invalidate all related queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
-      queryClient.invalidateQueries({ queryKey: ["today-collection"] });
-      queryClient.invalidateQueries({ queryKey: ["customer-loans"] });
+      // Force refetch all related queries immediately
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["loans"], refetchType: "active" }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard-summary"], refetchType: "active" }),
+        queryClient.invalidateQueries({ queryKey: ["today-collection"], refetchType: "active" }),
+        queryClient.invalidateQueries({ queryKey: ["customer-loans"], refetchType: "active" }),
+      ]);
       resetForm();
     },
     onError: (error: any) => {
