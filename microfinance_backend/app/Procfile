@@ -1,1 +1,2 @@
-web: uvicorn app.main:app --host=0.0.0.0 --port=$PORT
+# Overwrite Procfile with correct uvicorn command (use double quotes here)
+Set-Content -Path Procfile -Value 'web: uvicorn microfinance_backend.app.main:app --host=0.0.0.0 --port=$PORT'
